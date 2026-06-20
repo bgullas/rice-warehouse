@@ -37,6 +37,11 @@ export default function LoginPage() {
 
         {/* Card */}
         <div className="bg-white rounded-2xl shadow-2xl p-8">
+          <img
+            src={`${import.meta.env.BASE_URL}fortx-logo.jpeg`}
+            alt="FORTX — Powered by BluGraph"
+            className="w-full max-w-[260px] mx-auto mb-6"
+          />
           <h2 className="text-xl font-semibold text-gray-900 mb-6">Sign in</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>

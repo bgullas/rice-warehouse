@@ -91,9 +91,16 @@ export default function DashboardPage() {
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-sm text-gray-500">{data.config.name}</p>
+        <div className="flex items-center gap-4">
+          <img
+            src={`${import.meta.env.BASE_URL}fortx-logo.jpeg`}
+            alt="FORTX — Powered by BluGraph"
+            className="h-14 w-auto rounded-lg border border-gray-100 shadow-sm"
+          />
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+            <p className="text-sm text-gray-500">{data.config.name}</p>
+          </div>
         </div>
         <div className="flex items-center gap-2 bg-white rounded-lg border border-gray-200 p-1">
           {(['daily', 'weekly', 'monthly'] as Period[]).map(p => (

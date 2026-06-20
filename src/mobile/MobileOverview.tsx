@@ -62,6 +62,13 @@ export default function MobileOverview() {
 
   return (
     <div className="p-4 space-y-4">
+      <div className="bg-white rounded-xl border border-gray-200 p-3 flex items-center justify-center">
+        <img
+          src={`${import.meta.env.BASE_URL}fortx-logo.jpeg`}
+          alt="FORTX — Powered by BluGraph"
+          className="h-12 w-auto"
+        />
+      </div>
       <h1 className="text-xl font-bold text-gray-900">Overview</h1>
 
       {/* FIFO alert */}
