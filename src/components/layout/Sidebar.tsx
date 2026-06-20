@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import {
-  LayoutDashboard, Boxes, Package, FileText, Settings, Users, LogOut, Wheat,
+  LayoutDashboard, Boxes, Package, FileText, Settings, Users, LogOut, Wheat, Smartphone,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -66,6 +66,13 @@ export default function Sidebar() {
             <p className="text-xs text-green-400 capitalize">{currentUser?.role}</p>
           </div>
         </div>
+        <NavLink
+          to="/m"
+          className="w-full flex items-center gap-2 px-3 py-2 mb-1 rounded-lg text-sm text-green-300 hover:bg-green-800 hover:text-white transition-colors"
+        >
+          <Smartphone size={16} />
+          Mobile view
+        </NavLink>
         <button
           onClick={logout}
           className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-green-300 hover:bg-green-800 hover:text-white transition-colors"

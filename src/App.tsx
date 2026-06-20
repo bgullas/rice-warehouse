@@ -9,6 +9,10 @@ import ContainerFormPage from './pages/ContainerFormPage';
 import ReportsPage from './pages/ReportsPage';
 import SettingsPage from './pages/SettingsPage';
 import UsersPage from './pages/UsersPage';
+import MobileLayout from './mobile/MobileLayout';
+import MobileOverview from './mobile/MobileOverview';
+import MobileAddContainer from './mobile/MobileAddContainer';
+import MobileCheckout from './mobile/MobileCheckout';
 
 function PrivateRoute({ children, adminOnly }: { children: React.ReactNode; adminOnly?: boolean }) {
   const { currentUser } = useAuth();
@@ -19,9 +23,11 @@ function PrivateRoute({ children, adminOnly }: { children: React.ReactNode; admi
 
 function AppRoutes() {
   const { currentUser } = useAuth();
+  const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
+  const home = isMobile ? '/m' : '/';
   return (
     <Routes>
-      <Route path="/login" element={currentUser ? <Navigate to="/" replace /> : <LoginPage />} />
+      <Route path="/login" element={currentUser ? <Navigate to={home} replace /> : <LoginPage />} />
       <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
         <Route index element={<DashboardPage />} />
         <Route path="warehouse" element={<WarehousePage />} />
@@ -31,6 +37,11 @@ function AppRoutes() {
         <Route path="settings" element={<PrivateRoute adminOnly><SettingsPage /></PrivateRoute>} />
         <Route path="users" element={<PrivateRoute adminOnly><UsersPage /></PrivateRoute>} />
       </Route>
+      <Route path="/m" element={<PrivateRoute><MobileLayout /></PrivateRoute>}>
+        <Route index element={<MobileOverview />} />
+        <Route path="add" element={<MobileAddContainer />} />
+        <Route path="checkout" element={<MobileCheckout />} />
+      </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
@@ -38,7 +49,7 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <AuthProvider>
         <AppRoutes />
       </AuthProvider>
