@@ -28,15 +28,19 @@ export interface StorageSlot {
 }
 
 export type RiceType =
-  | 'Jasmine White'
-  | 'Jasmine Brown'
-  | 'Basmati'
+  | 'Basmati 1121'
+  | 'Basmati 386'
+  | 'Ponni Rice'
+  | 'Golden Ponni'
+  | 'Idly Ponni'
+  | 'Broken Rice'
+  | 'Sona Masuri'
+  | 'PR-14'
   | 'Parboiled'
+  | 'Brown Rice'
+  | 'Glutinous'
   | 'Short Grain'
   | 'Long Grain'
-  | 'Glutinous'
-  | 'Brown Rice'
-  | 'Fragrant'
   | 'Other';
 
 export interface ContainerLot {

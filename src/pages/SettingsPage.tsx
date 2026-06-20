@@ -1,16 +1,13 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { Save, RotateCcw, AlertTriangle } from 'lucide-react';
+import { Save, Grid } from 'lucide-react';
 import { useAppStore } from '../store/useAppStore';
 import type { WarehouseConfig } from '../types';
 
 export default function SettingsPage() {
-  const { data, updateConfig, resetWarehouse } = useAppStore();
+  const { data, updateConfig } = useAppStore();
   const [form, setForm] = useState<WarehouseConfig>({ ...data.config });
   const [saved, setSaved] = useState(false);
-  const [resetRows, setResetRows] = useState(data.config.rows);
-  const [resetCols, setResetCols] = useState(data.config.cols);
-  const [showReset, setShowReset] = useState(false);
 
   function set(key: keyof WarehouseConfig, value: string | number) {
     setForm(f => ({ ...f, [key]: value }));
@@ -23,13 +20,8 @@ export default function SettingsPage() {
     setTimeout(() => setSaved(false), 2000);
   }
 
-  function handleReset() {
-    if (window.confirm(`This will reconfigure the warehouse to ${resetRows}×${resetCols} slots. Existing slot data will be preserved where possible. Continue?`)) {
-      resetWarehouse(resetRows, resetCols);
-      setForm(f => ({ ...f, rows: resetRows, cols: resetCols }));
-      setShowReset(false);
-    }
-  }
+  const totalSlots = form.rows * form.cols;
+  const occupiedCount = data.slots.filter(s => s.status === 'occupied').length;
 
   return (
     <div className="p-6 max-w-2xl space-y-6">
@@ -51,56 +43,43 @@ export default function SettingsPage() {
             <input className="input" value={form.uen} onChange={e => set('uen', e.target.value)} />
           </Field>
         </div>
+
+        <h2 className="font-semibold text-gray-800 border-b border-gray-100 pb-3 pt-2 flex items-center gap-2">
+          <Grid size={16} className="text-gray-500" /> Grid Configuration
+        </h2>
         <div className="grid grid-cols-2 gap-4">
-          <Field label="Warehouse Rows">
-            <input type="number" min="1" max="20" className="input" value={form.rows} onChange={e => set('rows', +e.target.value)} />
+          <Field label="Rows (max 25, A–Y)">
+            <input type="number" min="1" max="25" className="input" value={form.rows}
+              onChange={e => set('rows', Math.min(25, Math.max(1, +e.target.value)))} />
           </Field>
-          <Field label="Warehouse Columns">
-            <input type="number" min="1" max="20" className="input" value={form.cols} onChange={e => set('cols', +e.target.value)} />
+          <Field label="Columns (max 10)">
+            <input type="number" min="1" max="10" className="input" value={form.cols}
+              onChange={e => set('cols', Math.min(10, Math.max(1, +e.target.value)))} />
           </Field>
         </div>
-        <p className="text-sm text-gray-500">Total slots: <strong>{form.rows * form.cols}</strong> (max 200)</p>
+
+        <div className={`rounded-lg p-3 text-sm ${totalSlots > 200 ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-800'}`}>
+          <span className="font-semibold">{form.rows} × {form.cols} = {totalSlots} slots</span>
+          {totalSlots > 200 && <span className="ml-2">⚠ Exceeds SFA 200-slot limit</span>}
+          {totalSlots <= 200 && <span className="ml-2 text-green-600">✓ Within SFA limit (max 200)</span>}
+        </div>
+        <p className="text-xs text-gray-500 flex items-center gap-1">
+          ℹ Existing slot data is always preserved when the grid is resized. Lots in slots outside the new bounds remain in the system but will not appear on the grid until the grid is expanded again.
+        </p>
+        {occupiedCount > 0 && (
+          <p className="text-xs text-amber-600">
+            {occupiedCount} occupied slot{occupiedCount > 1 ? 's' : ''} currently active — their data will not be lost.
+          </p>
+        )}
 
         <div className="flex justify-end pt-2">
-          <button type="submit" className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white px-5 py-2.5 rounded-lg text-sm font-medium">
+          <button type="submit" disabled={totalSlots > 200}
+            className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white px-5 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50">
             <Save size={15} />
             {saved ? 'Saved!' : 'Save Settings'}
           </button>
         </div>
       </form>
-
-      {/* Danger zone */}
-      <div className="bg-white rounded-xl border border-red-200 p-6">
-        <h2 className="font-semibold text-red-700 mb-3 flex items-center gap-2">
-          <AlertTriangle size={16} /> Reconfigure Warehouse Grid
-        </h2>
-        <p className="text-sm text-gray-600 mb-4">
-          Change the grid dimensions. Slots outside the new dimensions will be hidden.
-          All existing occupied slots within bounds will be preserved.
-        </p>
-        {!showReset ? (
-          <button onClick={() => setShowReset(true)} className="px-4 py-2 border border-red-300 text-red-700 rounded-lg text-sm hover:bg-red-50">
-            Reconfigure Grid
-          </button>
-        ) : (
-          <div className="flex items-end gap-4 flex-wrap">
-            <div>
-              <label className="label text-red-700">Rows</label>
-              <input type="number" min="1" max="20" className="input w-20" value={resetRows} onChange={e => setResetRows(+e.target.value)} />
-            </div>
-            <div>
-              <label className="label text-red-700">Columns</label>
-              <input type="number" min="1" max="20" className="input w-20" value={resetCols} onChange={e => setResetCols(+e.target.value)} />
-            </div>
-            <div className="flex gap-2">
-              <button onClick={() => setShowReset(false)} className="px-4 py-2 border border-gray-200 text-gray-600 rounded-lg text-sm">Cancel</button>
-              <button onClick={handleReset} className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium">
-                <RotateCcw size={14} /> Apply
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
     </div>
   );
 }

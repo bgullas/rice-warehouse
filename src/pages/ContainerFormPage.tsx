@@ -8,15 +8,16 @@ import type { ContainerLot, RiceType } from '../types';
 import { generateLotNumber } from '../utils/helpers';
 
 const RICE_TYPES: RiceType[] = [
-  'Jasmine White', 'Jasmine Brown', 'Basmati', 'Parboiled',
-  'Short Grain', 'Long Grain', 'Glutinous', 'Brown Rice', 'Fragrant', 'Other',
+  'Basmati 1121', 'Basmati 386', 'Ponni Rice', 'Golden Ponni',
+  'Idly Ponni', 'Broken Rice', 'Sona Masuri', 'PR-14',
+  'Parboiled', 'Brown Rice', 'Glutinous', 'Short Grain', 'Long Grain', 'Other',
 ];
 
 const ORIGINS = ['Thailand', 'Vietnam', 'India', 'Myanmar', 'Pakistan', 'Cambodia', 'Laos', 'USA', 'Australia', 'Other'];
 
 const GRADES = ['Premium', 'Grade A', 'Grade B', 'Grade C', 'Standard'];
 
-type FormData = Omit<ContainerLot, 'id'>;
+type LotFormData = Omit<ContainerLot, 'id'>;
 
 export default function ContainerFormPage() {
   const nav = useNavigate();
@@ -29,17 +30,17 @@ export default function ContainerFormPage() {
 
   const existingLot = editId ? data.lots.find(l => l.id === editId) : undefined;
 
-  const [form, setForm] = useState<FormData>(() => {
-    if (existingLot) return { ...existingLot };
+  const [form, setForm] = useState<LotFormData>(() => {
+    if (existingLot) { const { id: _id, ...rest } = existingLot; return rest; }
     const today = new Date().toISOString().split('T')[0];
     const expiry = new Date(Date.now() + 365 * 86400000).toISOString().split('T')[0];
     return {
       lotNumber: generateLotNumber(),
       slotId: slotParam ?? '',
-      riceType: 'Jasmine White',
+      riceType: 'Basmati 1121',
       grade: 'Grade A',
       supplier: '',
-      supplierCountry: 'Thailand',
+      supplierCountry: 'India',
       origin: '',
       quantity: 0,
       weightPerUnit: 50,
@@ -75,7 +76,7 @@ export default function ContainerFormPage() {
     setForm(f => ({ ...f, totalWeight: f.quantity * f.weightPerUnit }));
   }, [form.quantity, form.weightPerUnit]);
 
-  function set(key: keyof FormData, value: string | number) {
+  function set(key: keyof LotFormData, value: string | number) {
     setForm(f => ({ ...f, [key]: value }));
     setErrors(e => { const n = { ...e }; delete n[key]; return n; });
   }
